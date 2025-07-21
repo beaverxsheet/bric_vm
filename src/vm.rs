@@ -383,7 +383,6 @@ impl Instruction {
 /// - `rom_blocks`: Rom regions to make read only for the processor Ordered: ram_address, length
 /// ## Examples
 /// This example instantiates a new VmDescription that maps the region from 0x0500 to 0x0600 into RAM at 0xf000 and has a callback at memory address 0x0123.
-/// Usually you will also want to load ROM. This can be done using the [`crate::util::load_rom_from_file`] function
 /// ```rust
 /// use bric_vm::vm::VmDescription;
 ///
@@ -711,7 +710,7 @@ impl Vm {
     /// Cycles the CPU. Interprets the instruction and increments the PC.
     /// ## Errors
     /// - A [`BError::ExecutionHaltedError`] if there are no more instructions to run
-    /// - A [`BError::ParseError`] if there has been an error parseing the instruction
+    /// - A [`BError::AsmParseError`] if there has been an error parseing the instruction
     pub fn cycle(&mut self) -> Result<(), BError> {
         let pcval = self.pc.get_val();
         let inst = self

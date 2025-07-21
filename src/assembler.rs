@@ -4,8 +4,8 @@ use regex::Regex;
 
 use crate::{BError, util::number_literal_to_u16, vm::VmDescription};
 
-/// Processes the [macro] section of a .basm file
-/// Reads macros and definitions and copies them to the appropriate locations in the [text] section.
+/// Processes the `\[macro\]` section of a .basm file
+/// Reads macros and definitions and copies them to the appropriate locations in the \[text\] section.
 pub mod preprocessor {
     use regex::{Captures, Regex};
     use std::cell::LazyCell;
@@ -82,11 +82,11 @@ pub mod preprocessor {
     pub(crate) const RE_NUMBER_LIT: LazyCell<Regex> =
         LazyCell::new(|| Regex::new(r"^(0x[0-9a-fA-F]+|0b[01]+|[0-9]+)?$").unwrap());
 
-    /// Do the pre-processing step. This replaces macros and defines in the [text] section
+    /// Do the pre-processing step. This replaces macros and defines in the \[text\] section
     pub fn preprocess(macros_text: &str, code: &str) -> Result<(String, usize), BError> {
         // This is incredibly inefficient because we go through the entire file for each step instead of going through only once or twice.
         // A more efficient lexer might be logos.
-        // This only runs on the `[macros]` section so it shouldn't be too bad...
+        // This only runs on the `\[macros\]` section so it shouldn't be too bad...
 
         let mut macros: HashMap<String, Macro> = HashMap::new();
         let mut defines = HashMap::<String, u16>::new();
@@ -269,7 +269,7 @@ pub mod preprocessor {
     }
 }
 
-/// Processes the [text] section of a .basm file and returns the logic part of ROM
+/// Processes the \[text\] section of a .basm file and returns the logic part of ROM
 pub mod text_processor {
     use crate::{
         BError,
@@ -807,7 +807,7 @@ pub mod text_processor {
     }
 }
 
-/// Process the [const] section of a .basm file
+/// Process the \[const\] section of a .basm file
 pub mod const_processor {
     use crate::{
         BError,
@@ -821,7 +821,7 @@ pub mod const_processor {
 
     /// build the const section in ROM,
     /// replace labels to consts and then build a VmDescription which maps consts to the `mount_position`
-    /// `const_offset` is the line number of the [const] label
+    /// `const_offset` is the line number of the \[const\] label
     /// TODO: we don't check label names here either
     pub fn find_and_place(
         asm: AssemblerOutput,
