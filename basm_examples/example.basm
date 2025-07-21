@@ -1,0 +1,35 @@
+[macros]
+define SP 0
+
+begin abc.def (ghi)
+    A = ghi
+    D = add, 0, A
+    A = SP
+    *A = inc, *A
+    A = dec, *A
+    *A = add, 0, D
+end
+
+[text]
+# Set up stack
+A = 0x100
+D = add, 0, A
+A = SP
+*A = add, 0, D
+
+A = 10
+E = add, 0, A
+
+label test:
+abc.def(0x0bad)
+A = test
+E = dec, E; JGT
+
+# load some constant into A
+A = some_fs
+A = add, 0, *A
+
+[consts 0x7000]
+label some_fs:
+M=0xffff
+M=0xffff

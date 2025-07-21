@@ -1,0 +1,69 @@
+[macros]
+define U_BAUD 0x6000
+define U_OUT 0x6001
+define U_IFL 0x6003
+define U_OFL 0x6004
+
+[text]
+# set 9600 baud (40000000 / 9600 = (approx) 4167)
+A = 4167
+D = add, 0, A
+A = U_BAUD
+*A = add, 0, D
+
+# write string at hello_world tu UART
+# set up string pointer
+A = hello_world
+E = add, 0, A
+label write_string:
+# set OW to low
+A = U_OFL
+*A = and, 0, A
+
+# wait for OR to be high
+label wait:
+A = U_IFL
+D = add, 0, *A
+A = 0b100
+D = and, D, A
+A = wait
+add, 0, D; JEQ
+
+# get byte
+A = add, 0, E
+D = add, 0, *A
+E = inc, E
+# check if we are at the end of the string
+A = finish
+add, 0, D; JEQ
+# push byte to FIFO
+A = U_OUT
+*A = add, 0, D
+# set OW high
+A = U_OFL
+*A = inc, 0
+
+# loop
+A = write_string
+JMP
+
+label finish:
+A = 0x7fff
+JMP
+
+[consts 0x7000]
+label hello_world:
+M = 0x48
+M = 0x65
+M = 0x6c
+M = 0x6c
+M = 0x6f
+M = 0x20
+M = 0x57
+M = 0x6f
+M = 0x72
+M = 0x6c
+M = 0x64
+M = 0x21
+M = 0x0a
+M = 0x00

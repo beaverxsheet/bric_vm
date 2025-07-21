@@ -1,0 +1,73 @@
+[macros]
+define U_BAUD 0x6000
+define U_OUT 0x6001
+define U_IN 0x6002
+define U_IFL 0x6003
+define U_OFL 0x6004
+
+[text]
+# set 9600 baud
+A = 4167
+D = add, 0, A
+A = U_BAUD
+*A = add, 0, D
+
+# counter
+F = and, 0, A
+
+label loop:
+# set IR and OW to low
+A = U_OFL
+*A = and, 0, A
+
+# wait for DA to be high
+label wait_da:
+A = U_IFL
+D = add, 0, *A
+A = 0b010
+D = and, D, A
+A = wait_da
+add, 0, D; JEQ
+
+F = inc, F
+A = continue
+dec, F; JNE
+# read and get rid of leading 0 byte
+A = 0b10
+D = add, 0, A
+A = U_OFL
+*A = add, 0, D
+A = loop
+JMP
+
+label continue:
+# get a byte from UART
+A = U_IN
+E = add, 0, *A
+
+# wait for OR to be high
+label wait_or:
+A = U_IFL
+D = add, 0, *A
+A = 0b100
+D = and, D, A
+A = wait_or
+add, 0, D; JEQ
+
+# push byte to FIFO
+A = U_OUT
+*A = add, 0, E
+
+# set IR and OW high
+label set_high:
+A = 0b11
+D = add, 0, A
+A = U_OFL
+*A = add, 0, D
+
+# loop
+A = loop
+JMP
+
+
+[consts 0x7000]
